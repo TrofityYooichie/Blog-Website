@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Simple Server-backed Blog</title>
+  <style>
+    :root{--maxw:900px;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial}
+    body{font-family:var(--font),sans-serif;margin:0;padding:24px;background:#f6f7fb;color:#111}
+    .wrap{max-width:var(--maxw);margin:0 auto}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+    h1{font-size:clamp(20px,3vw,28px);margin:0}
+    .meta{color:#666;font-size:14px}
+    .posts{display:grid;gap:16px}
+    article{background:#fff;padding:16px;border-radius:10px;box-shadow:0 6px 18px rgba(12,18,31,0.06)}
+    article h2{margin:0 0 6px}
+    .post-meta{font-size:13px;color:#666;margin-bottom:10px}
+    .tags{font-size:12px;color:#0b66ff;margin-top:8px}
+    article img{max-width:100%;height:auto;border-radius:8px;margin-top:10px;display:block}
+    form{background:#fff;padding:12px;border-radius:10px;box-shadow:0 6px 18px rgba(12,18,31,0.04);margin-top:20px}
+    label{display:block;margin:8px 0 4px;font-weight:600}
+    input[type=text],textarea,input[type=url],input[type=file]{width:100%;padding:8px;border-radius:6px;border:1px solid #e6e9ef}
+    textarea{min-height:100px}
+    button{margin-top:10px;padding:8px 12px;border-radius:8px;border:0;background:#0b66ff;color:#fff;cursor:pointer}
+    footer{margin-top:28px;color:#666;font-size:13px;text-align:center}
+    .note{font-size:13px;color:#444}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>My Simple Blog</h1>
+        <div class="meta">Server-backed</div>
+      </div>
+      <div class="note">Open this page via the Node server (see steps).</div>
+    </header>
+
+    <section id="posts-section">
+      <div class="posts" id="posts"></div>
+    </section>
+
+    <section>
+      <form id="new-post-form" enctype="multipart/form-data">
+        <h3>Create a post</h3>
+
+        <label for="title">Title</label>
+        <input id="title" name="title" type="text" required />
+
+        <label for="author">Author</label>
+        <input id="author" name="author" type="text" required />
+
+        <label for="tags">Tags (comma separated)</label>
+        <input id="tags" name="tags" type="text" />
+
+        <label for="imageURL">Image URL (optional)</label>
+        <input id="imageURL" name="imageURL" type="url" placeholder="https://example.com/photo.jpg" />
+
+        <label for="imageFile">Upload image (optional, max 5 MB)</label>
+        <input id="imageFile" name="imageFile" type="file" accept="image/*" />
+
+        <label for="content">Content</label>
+        <textarea id="content" name="content" required></textarea>
+
+        <button type="submit">Publish</button>
+        <div style="font-size:12px;color:#666;margin-top:8px">Note: posts are saved on the server and visible to anyone who opens this site.</div>
+      </form>
+    </section>
+
+    <footer>
+      <div>Files: <strong>server.js</strong>, <strong>public/index.html</strong>, <strong>public/app.js</strong>, <strong>data/posts.json</strong></div>
+    </footer>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

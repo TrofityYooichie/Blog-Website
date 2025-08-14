@@ -1,0 +1,25 @@
+[
+  {
+    "id": 1755134081064,
+    "title": "My First Time",
+    "author": "Vano",
+    "tags": [
+      "Lifestyle",
+      "Hobby"
+    ],
+    "content": "I was lost in the darkness but then I found",
+    "image": "/uploads/1755134081062-depressed-anime-girl-having-coffee-4jdv563exdslyjy5.jpg",
+    "date": "2025-08-14T01:14:41.064Z"
+  },
+  {
+    "id": 1,
+    "title": "Welcome to the server-backed blog",
+    "author": "Vano",
+    "date": "2025-08-01T09:00:00.000Z",
+    "content": "This is an initial post saved on the server to welcome you.",
+    "tags": [
+      "welcome"
+    ],
+    "image": null
+  }
+]

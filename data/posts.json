@@ -1,0 +1,101 @@
+[
+  {
+    "id": 1755755366976,
+    "title": "The Gentle Art of Design: How Men Choose Colors, Textures & Spaces",
+    "author": "Vano",
+    "tags": [
+      "Fashion",
+      "Men",
+      "Design"
+    ],
+    "content": "Many men prefer restrained, purposeful design that looks clean and works well for daily life.\r\n\r\nPay attention to scale, texture, and a cohesive palette. Mix smooth and tactile materials (wool, leather, wood) to add depth without clutter. Test colors and fabrics in different light before committing, and keep most elements neutral with one or two accents.\r\n\r\nUse a capsule approach for both wardrobe and home: multipurpose pieces, fewer objects, and one curated statement (a rug, a lamp, a watch) create a calm, intentional space. Good design is quiet and practical — it makes life easier and looks effortless.",
+    "image": "/uploads/1755755366974-images3107-5cd464e8c63b9-1024x683.jpg",
+    "date": "2025-08-21T05:49:26.976Z"
+  },
+  {
+    "id": 1755755161805,
+    "title": "Signature Strength: Timeless vs Trendy — Finding Your Fashion Voice",
+    "author": "Vano",
+    "tags": [
+      "Fashion",
+      "Men",
+      "Design"
+    ],
+    "content": "Fashion is less about following every trend and more about choosing pieces that feel like you. A good wardrobe balances timeless basics with occasional trends so you look put-together without fuss.\r\n\r\nStart with well-fitting classics — a white shirt, dark jeans, a navy blazer, clean sneakers — and focus on fit first. Pick a simple color palette (3–5 colors) and add one statement piece per outfit to show personality. Invest in shoes and outerwear; small upgrades there lift everything else.\r\n\r\nAvoid buying impulsively to chase trends, and clear out items you never wear. The goal is a practical, confident wardrobe: fewer pieces you love are better than lots you don’t.",
+    "image": "/uploads/1755755161801-MFT1.jpg",
+    "date": "2025-08-21T05:46:01.805Z"
+  },
+  {
+    "id": 1755754690954,
+    "title": "How to Support the Men in Your Life",
+    "author": "Vano",
+    "tags": [
+      "Mental Health",
+      "Men",
+      "Support"
+    ],
+    "content": "Friends and family play a huge role in keeping people well — especially men who might not ask for help. Supporting someone doesn’t mean solving their problems; it means showing up in supportive, concrete ways.",
+    "image": null,
+    "date": "2025-08-21T05:38:10.954Z"
+  },
+  {
+    "id": 1755754616673,
+    "title": "Small Steps, Big Difference",
+    "author": "Vano",
+    "tags": [
+      "Mental Health",
+      "Men"
+    ],
+    "content": "Improving mental health doesn’t always require huge life changes. Small, consistent choices often give the biggest returns.",
+    "image": "/uploads/1755754616672-lehighcenter-june18-mentalhealthtreatment-1600x1000-1024x640.jpg",
+    "date": "2025-08-21T05:36:56.673Z"
+  },
+  {
+    "id": 1755754338406,
+    "title": "Why Men's Mental Health Matters",
+    "author": "Vano",
+    "tags": [
+      "Mental Health",
+      "Men"
+    ],
+    "content": "Men are taught to be strong, tough, and unshakeable — but strength also includes knowing when to ask for help. Men’s mental health is often overlooked because of stigma, cultural expectations, and myths that “real men” shouldn’t show vulnerability. That pressure produces real harm: untreated anxiety, depression, substance use, relationship strain, and in some cases, crisis.",
+    "image": "/uploads/1755754338405-Mens-Health.jpeg",
+    "date": "2025-08-21T05:32:18.406Z"
+  },
+  {
+    "id": 1,
+    "title": "Welcome to Lunar/Solar Blog",
+    "author": "Vano",
+    "date": "2025-08-01T09:00:00.000Z",
+    "content": "This is the first sample post. Enjoy the animations!",
+    "tags": [
+      "Intro",
+      "Welcome"
+    ],
+    "image": "https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=1200&q=80"
+  },
+  {
+    "id": 2,
+    "title": "Designing with motion",
+    "author": "Vano",
+    "date": "2025-08-03T15:30:00.000Z",
+    "content": "Motion can help with fluidity and delight users.",
+    "tags": [
+      "Design",
+      "Animations"
+    ],
+    "image": "https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=1200&q=80"
+  },
+  {
+    "id": 3,
+    "title": "How this demo works",
+    "author": "Vano",
+    "date": "2025-08-07T11:20:00.000Z",
+    "content": "Posts are read from posts.json and merged with posts you add via the form.",
+    "tags": [
+      "Howto",
+      "Notes"
+    ],
+    "image": null
+  }
+]

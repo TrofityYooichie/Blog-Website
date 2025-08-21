@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lunar Blog — server-backed</title>
+  <link rel="stylesheet" href="styles.css" />
+  <meta name="description" content="Solar Blog — animated server-backed blog (posts saved to server)" />
+</head>
+<body>
+  <div class="app">
+    <header class="site-header">
+      <div class="brand">
+        <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">🌙</button>
+        <h1 id="brandTitle">Lunar Blog</h1>
+        <p class="subtitle">animated, simple, and responsive</p>
+      </div>
+
+      <div class="controls">
+        <input id="searchInput" type="search" placeholder="Search posts..." aria-label="Search posts" />
+        <select id="tagFilter" aria-label="Filter by tag">
+          <option value="">All tags</option>
+        </select>
+        <button id="newPostBtn" class="cta">New Post</button>
+      </div>
+    </header>
+
+    <main class="main">
+      <section id="postsGrid" class="posts-grid" aria-live="polite"></section>
+      <div class="load-more-wrap">
+        <button id="loadMoreBtn" class="ghost">Load more</button>
+      </div>
+    </main>
+
+    <aside class="sidebar">
+      <div class="about card">
+        <h3>About</h3>
+        <p>Lunar/Solar Blog is a Blog where i share about my thoughts.</p>
+      </div>
+
+      <div class="tags card">
+        <h3>Tags</h3>
+        <div id="tagList" class="tag-list"></div>
+      </div>
+    </aside>
+
+    <footer class="site-footer">
+      <small style="padding-bottom: 2rem;">Built with ♥ • Server-backed — posts saved in <code>data/posts.json</code>.</small>
+    </footer>
+  </div>
+
+  <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog">
+    <button id="lightboxClose" class="lb-close" aria-label="Close">✕</button>
+    <img id="lightboxImg" alt="" />
+    <div id="lightboxCaption" class="lb-caption"></div>
+  </div>
+
+  <div id="newPostModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="newPostTitle">
+    <div class="modal-card">
+      <button id="modalClose" class="modal-close" aria-label="Close">✕</button>
+      <h2 id="newPostTitle">Create a new post</h2>
+      <form id="newPostForm" class="new-post-form" enctype="multipart/form-data">
+        <label>Title <input name="title" required /></label>
+        <label>Author <input name="author" required /></label>
+        <label>Tags (comma separated) <input name="tags" placeholder="tag1, tag2" /></label>
+        <label>Image URL <input name="imageURL" type="url" placeholder="https://example.com/photo.jpg" /></label>
+        <label>Upload image <input id="imageFile" name="imageFile" type="file" accept="image/*" /></label>
+        <label>Content <textarea name="content" rows="6" required></textarea></label>
+        <div class="form-actions">
+          <button type="submit" class="cta">Publish</button>
+          <button type="button" id="cancelPost" class="ghost">Cancel</button>
+        </div>
+        <p class="tiny">Note: publishing will send the post to the server and make it visible to everyone. Anyone who can call the API can post — consider adding an API key for protection.</p>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js" defer></script>
+</body>
+</html>

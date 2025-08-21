@@ -102,33 +102,40 @@ function createPostCard(post, idx) {
   const contentHtml = `<div class="post-content">${nl2br(escapeHtml(post.content || ''))}</div>`;
   art.innerHTML = titleHtml + metaHtml + contentHtml;
 
-  // --- validate image before creating <img> ---
   if (post.image && isLikelyImageSrc(post.image)) {
     const img = document.createElement('img');
     img.loading = 'lazy';
     img.alt = post.title || 'post image';
-    // If the src looks like a relative path, keep it as-is; if it starts with '/', remove leading slash to be safe
+
+    // Normalize src:
     let src = String(post.image).trim();
-    if (src.startsWith('/')) {
-      // convert to relative path to avoid root mismatch on GitHub Pages
-      src = src.slice(1);
-    }
+    // If it starts with a leading slash, remove it so it works on GitHub Pages subpaths
+    if (src.startsWith('/')) src = src.slice(1);
+
     img.src = src;
+
+    // optional: allow crossOrigin for some hosts (may help with CORS if host allows it)
+    // img.crossOrigin = 'anonymous';
 
     // graceful fallback if image fails to load
     img.onerror = () => {
-      // remove the broken image to prevent showing alt text
+      // remove the broken image to prevent alt text display
       img.remove();
-      // optionally show a small placeholder (comment out if you prefer no placeholder)
+
+      // insert a small placeholder element where the image was
       const ph = document.createElement('div');
       ph.className = 'img-placeholder';
-      ph.textContent = 'Image not found';
+      ph.textContent = 'Image not available';
       ph.style.padding = '18px';
       ph.style.borderRadius = '8px';
-      ph.style.background = 'linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00))';
+      ph.style.background = 'linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00))';
       ph.style.color = 'var(--muted)';
       ph.style.fontSize = '13px';
-      art.insertBefore(ph, art.querySelector('.tags-inline') || null);
+
+      // insert placeholder before tags (if present) or append
+      const tagsNode = art.querySelector('.tags-inline');
+      if (tagsNode) art.insertBefore(ph, tagsNode);
+      else art.appendChild(ph);
     };
 
     img.addEventListener('click', () => openLightbox(src, post.title));
@@ -148,18 +155,21 @@ function createPostCard(post, idx) {
   postsGrid.appendChild(art);
 }
 
-// small helper to validate an image src string
 function isLikelyImageSrc(s) {
   if (!s) return false;
   s = String(s).trim();
-  // reject if looks like HTML or long title text
+
+  // reject obvious HTML
   if (s.includes('<') || s.includes('>')) return false;
+
   // allow data: URIs
   if (s.startsWith('data:')) return true;
-  // allow absolute https urls
-  if (s.startsWith('http://') || s.startsWith('https://')) return /\.(jpe?g|png|gif|webp|bmp)(\?.*)?$/i.test(s);
-  // allow relative file names that end with image extension (uploads/photo.jpg or images/photo.png)
-  return /\.(jpe?g|png|gif|webp|bmp)(\?.*)?$/i.test(s);
+
+  // allow http(s) URLs (even if they don't have a file extension)
+  if (s.startsWith('http://') || s.startsWith('https://')) return true;
+
+  // allow relative paths that end with common image extensions
+  return /\.(jpe?g|png|gif|webp|bmp|svg)(\?.*)?$/i.test(s);
 }
 
 /* ---------------- HELPERS ---------------- */
@@ -301,4 +311,5 @@ newPostForm.addEventListener('submit', async (ev) => {
 
 /* ---------------- INIT ---------------- */
 loadPosts();
+
 

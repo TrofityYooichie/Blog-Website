@@ -91,6 +91,7 @@ function renderNext(n = POSTS_PER_PAGE) {
   loadMoreBtn.style.display = state.shown < state.filtered.length ? 'inline-block' : 'none';
 }
 
+// Replace your existing createPostCard with this version
 function createPostCard(post, idx) {
   const art = document.createElement('article');
   art.className = 'post card post-animate';
@@ -101,29 +102,64 @@ function createPostCard(post, idx) {
   const contentHtml = `<div class="post-content">${nl2br(escapeHtml(post.content || ''))}</div>`;
   art.innerHTML = titleHtml + metaHtml + contentHtml;
 
-  if (post.image) {
+  // --- validate image before creating <img> ---
+  if (post.image && isLikelyImageSrc(post.image)) {
     const img = document.createElement('img');
     img.loading = 'lazy';
     img.alt = post.title || 'post image';
-    img.src = post.image;
-    img.addEventListener('click', () => openLightbox(post.image, post.title));
+    // If the src looks like a relative path, keep it as-is; if it starts with '/', remove leading slash to be safe
+    let src = String(post.image).trim();
+    if (src.startsWith('/')) {
+      // convert to relative path to avoid root mismatch on GitHub Pages
+      src = src.slice(1);
+    }
+    img.src = src;
+
+    // graceful fallback if image fails to load
+    img.onerror = () => {
+      // remove the broken image to prevent showing alt text
+      img.remove();
+      // optionally show a small placeholder (comment out if you prefer no placeholder)
+      const ph = document.createElement('div');
+      ph.className = 'img-placeholder';
+      ph.textContent = 'Image not found';
+      ph.style.padding = '18px';
+      ph.style.borderRadius = '8px';
+      ph.style.background = 'linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00))';
+      ph.style.color = 'var(--muted)';
+      ph.style.fontSize = '13px';
+      art.insertBefore(ph, art.querySelector('.tags-inline') || null);
+    };
+
+    img.addEventListener('click', () => openLightbox(src, post.title));
     art.appendChild(img);
   }
 
   const tagsDiv = document.createElement('div');
   tagsDiv.className = 'tags-inline';
+  tagsDiv.style.marginTop = '0.8rem';
   const tagsHtml = (post.tags || []).map(t => `<span class="tag" data-tag="${escapeHtml(t)}">${escapeHtml(t)}</span>`).join(' ');
   tagsDiv.innerHTML = tagsHtml;
   tagsDiv.querySelectorAll('.tag').forEach(t => {
-    t.addEventListener('click', () => {
-      applyTagFilter(t.getAttribute('data-tag'));
-    });
+    t.addEventListener('click', () => applyTagFilter(t.getAttribute('data-tag')));
   });
-  // give some vertical spacing if needed (in case css didn't)
-  tagsDiv.style.marginTop = '0.8rem';
   art.appendChild(tagsDiv);
 
   postsGrid.appendChild(art);
+}
+
+// small helper to validate an image src string
+function isLikelyImageSrc(s) {
+  if (!s) return false;
+  s = String(s).trim();
+  // reject if looks like HTML or long title text
+  if (s.includes('<') || s.includes('>')) return false;
+  // allow data: URIs
+  if (s.startsWith('data:')) return true;
+  // allow absolute https urls
+  if (s.startsWith('http://') || s.startsWith('https://')) return /\.(jpe?g|png|gif|webp|bmp)(\?.*)?$/i.test(s);
+  // allow relative file names that end with image extension (uploads/photo.jpg or images/photo.png)
+  return /\.(jpe?g|png|gif|webp|bmp)(\?.*)?$/i.test(s);
 }
 
 /* ---------------- HELPERS ---------------- */
@@ -265,3 +301,4 @@ newPostForm.addEventListener('submit', async (ev) => {
 
 /* ---------------- INIT ---------------- */
 loadPosts();
+

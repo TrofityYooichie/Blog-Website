@@ -1,6 +1,12 @@
-const API_BASE = '';
+// public/app.js (static/GitHub-Pages-friendly)
+// - Loads posts from POSTS_JSON_PATH (read-only).
+// - Merges user-created posts stored in localStorage (visible only locally).
+// - Supports image uploads (saved locally as data: URLs).
+// - Keeps theme toggle, search, tags, pagination, lightbox.
 
+const POSTS_JSON_PATH = 'data/posts.json'; // <-- EDIT THIS if your posts.json is at root use 'posts.json'
 const POSTS_PER_PAGE = 6;
+
 const state = {
   posts: [],
   filtered: [],
@@ -8,6 +14,7 @@ const state = {
   theme: localStorage.getItem('glow_theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme:light)').matches ? 'light' : 'dark')
 };
 
+// Dom refs
 const postsGrid = document.getElementById('postsGrid');
 const loadMoreBtn = document.getElementById('loadMoreBtn');
 const searchInput = document.getElementById('searchInput');
@@ -23,39 +30,46 @@ const lightbox = document.getElementById('lightbox');
 const lightboxImg = document.getElementById('lightboxImg');
 const lightboxClose = document.getElementById('lightboxClose');
 const lightboxCaption = document.getElementById('lightboxCaption');
-const brandTitle = document.getElementById('brandTitle');
+const brandTitle = document.getElementById('brandTitle'); // if you added this earlier
 
+/* ---------------- THEME ---------------- */
 function applyTheme() {
   if (state.theme === 'light') {
     document.documentElement.classList.add('light');
-    brandTitle.textContent = 'Solar Blog';
+    if (brandTitle) brandTitle.textContent = 'Solar Blog';
     themeToggle.textContent = '🌙';
     document.title = 'Solar Blog';
   } else {
     document.documentElement.classList.remove('light');
-    brandTitle.textContent = 'Lunar Blog';
+    if (brandTitle) brandTitle.textContent = 'Lunar Blog';
     themeToggle.textContent = '☀️';
     document.title = 'Lunar Blog';
   }
   localStorage.setItem('glow_theme', state.theme);
 }
-
 applyTheme();
 themeToggle.addEventListener('click', () => {
   state.theme = state.theme === 'light' ? 'dark' : 'light';
   applyTheme();
 });
 
+/* ---------------- LOAD POSTS (static) ---------------- */
 async function loadPosts() {
+  // load static posts JSON from repo
+  let disk = [];
   try {
-    const r = await fetch(API_BASE + '/api/posts', { cache: 'no-store' });
-    if (!r.ok) throw new Error('Failed to fetch posts: ' + r.status);
-    const posts = await r.json();
-    state.posts = Array.isArray(posts) ? posts : [];
+    const r = await fetch(POSTS_JSON_PATH, { cache: 'no-store' });
+    if (r.ok) disk = await r.json();
   } catch (e) {
-    console.error('Could not load posts', e);
-    state.posts = [];
+    console.warn('Could not load posts.json:', e);
+    disk = [];
   }
+
+  // load local posts stored in browser
+  const local = JSON.parse(localStorage.getItem('glow_local_posts') || '[]');
+
+  // combine: disk posts first (older), then local posts on top
+  state.posts = Array.isArray(disk) ? [...disk, ...local] : [...local];
   sortPosts();
   state.filtered = state.posts.slice();
   populateTagFilter();
@@ -65,15 +79,14 @@ async function loadPosts() {
 }
 
 function sortPosts() {
-  state.posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+  state.posts.sort((a,b) => new Date(b.date) - new Date(a.date));
 }
 
+/* ---------------- RENDER / PAGINATION ---------------- */
 function renderNext(n = POSTS_PER_PAGE) {
   const start = state.shown;
   const end = Math.min(state.filtered.length, start + n);
-  for (let i = start; i < end; i++) {
-    createPostCard(state.filtered[i], i);
-  }
+  for (let i = start; i < end; i++) createPostCard(state.filtered[i], i);
   state.shown = end;
   loadMoreBtn.style.display = state.shown < state.filtered.length ? 'inline-block' : 'none';
 }
@@ -86,7 +99,6 @@ function createPostCard(post, idx) {
   const titleHtml = `<h2>${escapeHtml(post.title)}</h2>`;
   const metaHtml = `<div class="post-meta">By ${escapeHtml(post.author)} — ${formatDate(post.date)}</div>`;
   const contentHtml = `<div class="post-content">${nl2br(escapeHtml(post.content || ''))}</div>`;
-
   art.innerHTML = titleHtml + metaHtml + contentHtml;
 
   if (post.image) {
@@ -100,25 +112,26 @@ function createPostCard(post, idx) {
 
   const tagsDiv = document.createElement('div');
   tagsDiv.className = 'tags-inline';
-  tagsDiv.innerHTML = (post.tags || []).map(t => `<span class="tag" data-tag="${escapeHtml(t)}">${escapeHtml(t)}</span>`).join(' ');
+  const tagsHtml = (post.tags || []).map(t => `<span class="tag" data-tag="${escapeHtml(t)}">${escapeHtml(t)}</span>`).join(' ');
+  tagsDiv.innerHTML = tagsHtml;
   tagsDiv.querySelectorAll('.tag').forEach(t => {
     t.addEventListener('click', () => {
-      const tag = t.getAttribute('data-tag');
-      applyTagFilter(tag);
+      applyTagFilter(t.getAttribute('data-tag'));
     });
   });
+  // give some vertical spacing if needed (in case css didn't)
+  tagsDiv.style.marginTop = '0.8rem';
   art.appendChild(tagsDiv);
 
   postsGrid.appendChild(art);
 }
 
-function escapeHtml(s) {
-  if (s == null) return '';
-  return String(s).replace(/&/g, '&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
-}
+/* ---------------- HELPERS ---------------- */
+function escapeHtml(s){ if (s==null) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
 function nl2br(s){ return String(s || '').replace(/\n/g, '<br>'); }
 function formatDate(d){ try{ return new Date(d).toLocaleString(); }catch(e){ return d; } }
 
+/* ---------------- FILTERS / TAGS ---------------- */
 searchInput.addEventListener('input', () => applyFilters());
 tagFilter.addEventListener('change', () => applyFilters());
 
@@ -146,6 +159,7 @@ function populateTagFilter() {
     opt.textContent = t;
     tagFilter.appendChild(opt);
   });
+
   tagList.innerHTML = '';
   allTags.forEach(t => {
     const but = document.createElement('button');
@@ -163,8 +177,10 @@ function applyTagFilter(tag) {
   postsGrid.scrollIntoView({behavior:'smooth'});
 }
 
+/* ---------------- LOAD MORE ---------------- */
 loadMoreBtn.addEventListener('click', () => renderNext());
 
+/* ---------------- LIGHTBOX ---------------- */
 function openLightbox(src, caption) {
   lightboxImg.src = src;
   lightboxImg.alt = caption || '';
@@ -181,6 +197,7 @@ lightboxClose.addEventListener('click', closeLightbox);
 lightbox.addEventListener('click', (e) => { if (e.target === lightbox || e.target === lightboxImg) closeLightbox(); });
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeLightbox(); closeModal(); } });
 
+/* ---------------- NEW POST (local only) ---------------- */
 newPostBtn.addEventListener('click', openModal);
 modalClose.addEventListener('click', closeModal);
 cancelPost.addEventListener('click', closeModal);
@@ -207,31 +224,44 @@ function readFileAsDataURL(file){
 newPostForm.addEventListener('submit', async (ev) => {
   ev.preventDefault();
   const fm = new FormData(newPostForm);
-  try {
-    const resp = await fetch(API_BASE + '/api/posts', {
-      method: 'POST',
-      body: fm
-    });
 
-    const text = await resp.text();
-    let data;
-    if (text && text.trim()) {
-      try { data = JSON.parse(text); } catch (e) { throw new Error('Server returned invalid JSON: ' + text); }
-    } else {
-      if (!resp.ok) throw new Error('Server returned status ' + resp.status + ' with empty body.');
+  let imageVal = null;
+  const fileInput = newPostForm.querySelector('input[name="imageFile"]');
+  const file = fileInput && fileInput.files && fileInput.files[0];
+  if (file && file.size && file.type) {
+    try {
+      imageVal = await readFileAsDataURL(file); // stored locally as data URL
+    } catch (e) {
+      alert('Failed to read image file.');
+      return;
     }
-
-    if (!resp.ok) {
-      const message = data && data.error ? data.error : ('Server error: ' + resp.status);
-      throw new Error(message);
-    }
-
-    await loadPosts();
-    closeModal();
-  } catch (err) {
-    console.error('Submit error:', err);
-    alert('Failed to publish: ' + (err.message || err));
+  } else {
+    const url = (fm.get('imageURL') || '').trim();
+    if (url) imageVal = url;
   }
+
+  const post = {
+    id: Date.now(),
+    title: (fm.get('title') || '').trim() || 'Untitled',
+    author: (fm.get('author') || 'Anonymous').trim(),
+    tags: (fm.get('tags') || '').split(',').map(s => s.trim()).filter(Boolean),
+    content: (fm.get('content') || '').trim(),
+    image: imageVal || null,
+    date: new Date().toISOString()
+  };
+
+  // save to localStorage
+  const existing = JSON.parse(localStorage.getItem('glow_local_posts') || '[]');
+  existing.unshift(post);
+  localStorage.setItem('glow_local_posts', JSON.stringify(existing));
+
+  // merge into current in-memory posts and re-render (makes it visible immediately)
+  state.posts.unshift(post);
+  populateTagFilter();
+  applyFilters();
+  closeModal();
+  alert('Post added locally — visible only in your browser. To make it permanent, add to posts.json in the repo.');
 });
 
+/* ---------------- INIT ---------------- */
 loadPosts();
